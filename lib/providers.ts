@@ -383,9 +383,12 @@ function modelsIn(wire: Wire, body: unknown): ProbedModel[] {
   if (!isRecord(body)) return [];
   const list = wire === 'gemini' ? body.models : body.data;
   if (!Array.isArray(list)) return [];
+  const seen = new Set<string>();
   return list.flatMap((v) => {
     const m = modelIn(wire, v);
-    return m === null ? [] : [m];
+    if (m === null || seen.has(m.id)) return [];
+    seen.add(m.id);
+    return [m];
   });
 }
 

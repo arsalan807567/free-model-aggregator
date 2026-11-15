@@ -382,7 +382,9 @@ export async function* anthropicEventsFromOpenAI(upstream: ReadableStream<Uint8A
     for (;;) {
       const { value, done } = await reader.read();
       if (done) break;
-      buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, '\n');
+      // Normalize the accumulated buffer because a CRLF delimiter can straddle reads.
+      buffer += decoder.decode(value, { stream: true });
+      buffer = buffer.replace(/\r\n/g, '\n');
       let at = buffer.indexOf('\n\n');
       while (at !== -1) {
         const frame = buffer.slice(0, at);

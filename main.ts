@@ -448,6 +448,7 @@ async function start(): Promise<void> {
     void handle(req, res).catch((err: unknown) => {
       log((err as Error).stack ?? String(err));
       if (!res.headersSent) sendError(res, req.url?.startsWith('/v1/messages') === true ? 'anthropic' : 'openai', 500, 'internal_error', 'the server failed to answer');
+      else res.destroy();
     });
   });
   await listen(server);
